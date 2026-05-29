@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="lo">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ບົດຮຽນ | ຄູຢາຊາ</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+Lao:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--red:#C0392B;--red-lt:#E8534A;--red-dim:#FAE8E7;--gray:#8A8FA3;--gray-lt:#F4F5F7;--ink:#1E2027;}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html{scroll-behavior:smooth;}
+    body{font-family:'Noto Sans Lao',sans-serif;background:#F9FAFB;color:var(--ink);min-height:100vh;}
+    .font-cn{font-family:'Noto Serif SC',serif;}
+
+    nav{
+      position:sticky;top:0;z-index:50;
+      backdrop-filter:blur(18px);
+      background:rgba(255,255,255,.93);
+      border-bottom:1px solid #EAEBEE;
+    }
+
+    .tab{
+      display:inline-flex;align-items:center;gap:6px;
+      font-weight:700;padding:.6rem 1.3rem;
+      border-radius:50px;border:2px solid #E5E7EB;
+      cursor:pointer;transition:all .2s;
+      font-family:inherit;font-size:.88rem;
+      background:transparent;color:var(--gray);
+      white-space:nowrap;
+    }
+    .tab:hover{border-color:var(--red);color:var(--red);}
+    .tab.active{background:var(--red);color:#fff;border-color:var(--red);
+      box-shadow:0 4px 14px rgba(192,57,43,.28);}
+
+    .lcard{
+      background:#fff;border:1px solid #E8E9ED;border-radius:16px;
+      padding:18px 20px;display:flex;gap:14px;align-items:flex-start;
+      transition:box-shadow .22s,transform .22s;
+    }
+    .lcard:hover{box-shadow:0 8px 28px rgba(192,57,43,.09);transform:translateY(-2px);}
+
+    .num{
+      width:30px;height:30px;border-radius:50%;flex-shrink:0;
+      background:var(--red);color:#fff;
+      font-size:.72rem;font-weight:700;
+      display:flex;align-items:center;justify-content:center;
+      margin-top:3px;
+    }
+
+    .empty{
+      text-align:center;padding:72px 20px;
+      background:#fff;border-radius:20px;
+      border:2px dashed #E5E7EB;
+    }
+
+    .btn-back{
+      display:inline-flex;align-items:center;gap:6px;
+      color:var(--gray);font-weight:600;font-size:.85rem;
+      text-decoration:none;padding:.4rem .8rem;border-radius:8px;
+      transition:all .18s;
+    }
+    .btn-back:hover{background:var(--red-dim);color:var(--red);}
+
+    /* hero band at top of main */
+    .level-hero{
+      background:linear-gradient(135deg,var(--red) 0%,#E8534A 100%);
+      border-radius:20px;
+      padding:24px 28px;
+      color:#fff;
+      position:relative;
+      overflow:hidden;
+      margin-bottom:28px;
+    }
+    .level-hero .deco-char{
+      font-family:'Noto Serif SC',serif;
+      font-size:8rem;line-height:1;
+      position:absolute;right:-10px;bottom:-24px;
+      color:rgba(255,255,255,.1);
+      pointer-events:none;user-select:none;
+    }
+
+    @keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+    .fade-up{animation:fadeUp .4s ease both;}
+    #lesson-list .lcard:nth-child(1){animation-delay:.03s;}
+    #lesson-list .lcard:nth-child(2){animation-delay:.08s;}
+    #lesson-list .lcard:nth-child(3){animation-delay:.13s;}
+    #lesson-list .lcard:nth-child(4){animation-delay:.18s;}
+    #lesson-list .lcard:nth-child(5){animation-delay:.23s;}
+    #lesson-list .lcard:nth-child(n+6){animation-delay:.28s;}
+
+    @media(max-width:480px){
+      .tab{padding:.5rem .9rem;font-size:.8rem;}
+      .lcard{padding:14px 15px;gap:10px;}
+      .level-hero{padding:18px 20px;}
+      .level-hero .deco-char{font-size:5.5rem;}
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+<nav>
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
+    <a href="index.html" class="btn-back">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/>
+      </svg>
+      <span class="hidden sm:inline">ກັບໄປໜ້າຫຼັກ</span>
+      <span class="sm:hidden">ກັບ</span>
+    </a>
+
+    <span class="font-semibold text-sm" style="color:var(--gray);">ຄັງຄວາມຮູ້ · ບົດຮຽນ</span>
+
+    <span id="count-badge"
+      style="background:var(--red-dim);color:var(--red);font-size:.72rem;font-weight:700;
+             padding:.25rem .7rem;border-radius:50px;white-space:nowrap;">
+      0 ບົດ
+    </span>
+  </div>
+</nav>
+
+<!-- ══ MAIN ══ -->
+<main class="max-w-3xl mx-auto px-4 sm:px-6 py-6">
+
+  <!-- Level tabs -->
+  <div class="flex gap-2 sm:gap-3 flex-wrap mb-6">
+    <button class="tab" id="tab-beginner"     onclick="switchLevel('beginner')">
+      <span class="font-cn">初级</span>ເລີ່ມຕົ້ນ
+    </button>
+    <button class="tab" id="tab-intermediate" onclick="switchLevel('intermediate')">
+      <span class="font-cn">中级</span>ສົນທະນາ
+    </button>
+    <button class="tab" id="tab-advanced"     onclick="switchLevel('advanced')">
+      <span class="font-cn">高级</span>HSK
+    </button>
+  </div>
+
+  <!-- Hero band -->
+  <div class="level-hero fade-up" id="level-hero">
+    <p style="font-size:.7rem;font-weight:700;letter-spacing:.1em;opacity:.7;margin-bottom:4px;">LEVEL</p>
+    <div style="display:flex;align-items:baseline;gap:12px;">
+      <span class="font-cn" id="hero-cn" style="font-size:2.4rem;font-weight:700;line-height:1.1;">初级</span>
+      <span id="hero-label" style="font-size:1rem;font-weight:600;opacity:.9;">ລະດັບເລີ່ມຕົ້ນ</span>
+    </div>
+    <p id="hero-hsk" style="font-size:.78rem;opacity:.7;margin-top:4px;">HSK 1–2</p>
+    <div class="deco-char" id="hero-deco">初</div>
+  </div>
+
+  <!-- Lesson list -->
+  <div id="lesson-list" class="flex flex-col gap-3"></div>
+
+  <!-- Empty state -->
+  <div id="lesson-empty" class="empty hidden">
+    <p style="font-size:3.5rem;margin-bottom:12px;">📖</p>
+    <p class="font-bold text-lg" style="color:#374151;">ຍັງບໍ່ມີບົດຮຽນ</p>
+    <p class="text-sm mt-2" style="color:var(--gray);">ຄູຈະເພີ່ມໃຫ້ໃນໄວໆນີ້ 🙏</p>
+  </div>
+
+</main>
+
+<!-- ══ FOOTER ══ -->
+<footer class="text-center py-5 text-xs border-t border-gray-100 mt-6" style="color:var(--gray);">
+  <span class="font-cn" style="color:var(--red);font-size:.9rem;">学而不思则罔</span>
+  &nbsp;·&nbsp; ຄູຢາຊາ · ສອນພາສາຈີນ
+</footer>
+
+<script>
+  /*
+    Google Sheets / Apps Script connection
+    1) Put the same Web App URL as index.html here.
+    2) If WEB_APP_URL is not set yet, this page will still use localStorage as fallback.
+  */
+  const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxAmgsjdFA3bPASyuusrGWADXOUi2ZYSeT1w_a2G02a4U8jKx_TT_K2ijZj7k40bEg/exec';
+
+  const DB_KEY = 'kru_lessons';
+
+  const LEVELS = {
+    beginner:     { cn:'初级', deco:'初', label:'ລະດັບເລີ່ມຕົ້ນ', hsk:'HSK 1–2' },
+    intermediate: { cn:'中级', deco:'中', label:'ລະດັບສົນທະນາ',   hsk:'HSK 3–4' },
+    advanced:     { cn:'高级', deco:'高', label:'ກຽມສອບ HSK',      hsk:'HSK 4–5' },
+  };
+
+  const params = new URLSearchParams(location.search);
+  let cur = params.get('level') || 'beginner';
+  if (!LEVELS[cur]) cur = 'beginner';
+
+  let lessonData = [];
+
+  function getLocalLessons() {
+    try { return JSON.parse(localStorage.getItem(DB_KEY) || '[]'); }
+    catch(e) { return []; }
+  }
+
+  function parseLessonsFromData(data) {
+    try {
+      if (!data || !data.lessons) return [];
+      const parsed = JSON.parse(data.lessons);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch(e) {
+      return [];
+    }
+  }
+
+  async function loadLessons() {
+    // Fallback: localStorage if Apps Script URL has not been set yet
+    if (!WEB_APP_URL || WEB_APP_URL.includes('PASTE_YOUR')) {
+      lessonData = getLocalLessons();
+      render();
+      return;
+    }
+
+    try {
+      const res = await fetch(WEB_APP_URL + '?t=' + Date.now());
+      const json = await res.json();
+
+      if (!json.ok) throw new Error(json.error || 'Load failed');
+
+      lessonData = parseLessonsFromData(json.data);
+
+      // fallback to localStorage if Google data is empty
+      if (!lessonData.length) lessonData = getLocalLessons();
+
+      render();
+    } catch(err) {
+      console.warn('Google lesson load error:', err);
+      lessonData = getLocalLessons();
+      render();
+    }
+  }
+
+  function esc(s) {
+    return String(s||'')
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function render() {
+    const list    = document.getElementById('lesson-list');
+    const empty   = document.getElementById('lesson-empty');
+    const countBg = document.getElementById('count-badge');
+    const meta    = LEVELS[cur];
+
+    document.getElementById('hero-cn').textContent    = meta.cn;
+    document.getElementById('hero-label').textContent = meta.label;
+    document.getElementById('hero-hsk').textContent   = meta.hsk;
+    document.getElementById('hero-deco').textContent  = meta.deco;
+    document.title = meta.cn + ' ' + meta.label + ' | ຄູຢາຊາ';
+
+    Object.keys(LEVELS).forEach(lv => {
+      document.getElementById('tab-' + lv).classList.toggle('active', lv === cur);
+    });
+
+    const filtered = lessonData.filter(l => l.level === cur);
+    countBg.textContent = filtered.length + ' ບົດ';
+
+    list.innerHTML = '';
+
+    if (filtered.length === 0) {
+      empty.classList.remove('hidden');
+      return;
+    }
+    empty.classList.add('hidden');
+
+    filtered.forEach((lesson, i) => {
+      const card = document.createElement('div');
+      card.className = 'lcard fade-up';
+      card.innerHTML =
+        '<div class="num">' + (i + 1) + '</div>' +
+        '<div style="flex:1;min-width:0;">' +
+          '<p style="font-weight:700;font-size:.96rem;line-height:1.45;margin-bottom:6px;">' +
+            esc(lesson.title) +
+          '</p>' +
+          (lesson.desc
+            ? '<p style="font-size:.84rem;color:var(--gray);white-space:pre-wrap;line-height:1.75;">' +
+                esc(lesson.desc) + '</p>'
+            : '') +
+        '</div>';
+      list.appendChild(card);
+    });
+  }
+
+  function switchLevel(lv) {
+    cur = lv;
+    history.replaceState(null, '', '?level=' + lv);
+    render();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  loadLessons();
+</script>
+</body>
+</html>

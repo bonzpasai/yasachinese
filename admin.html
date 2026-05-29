@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="lo">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>⚙ Admin | ຄູຢາຊາ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <style>
+        :root {
+            --red: #C0392B;
+            --red-lt: #E8534A;
+            --red-dim: #FAE8E7;
+            --ink: #1E2027;
+        }
+
+        body {
+            font-family: 'Noto Sans Lao', sans-serif;
+            background: #F3F4F6;
+        }
+
+        #login-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(30, 32, 39, .97);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+        }
+
+        #sidebar {
+            width: 230px;
+            min-height: 100vh;
+            background: #1E2027;
+            position: sticky;
+            top: 0;
+            flex-shrink: 0;
+        }
+
+        @media(max-width:767px) {
+            #sidebar {
+                width: 100%;
+                min-height: auto;
+                position: relative;
+            }
+
+            #main-wrap {
+                flex-direction: column !important;
+            }
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: .6rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: .85rem;
+            color: rgba(255, 255, 255, .6);
+            transition: all .2s;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: rgba(192, 57, 43, .25);
+            color: #fff;
+        }
+
+        .nav-item.active {
+            border-left: 3px solid var(--red);
+        }
+
+        .panel {
+            display: none;
+        }
+
+        .panel.active {
+            display: block;
+        }
+
+        label {
+            display: block;
+            font-size: .78rem;
+            font-weight: 700;
+            color: #4B5563;
+            margin-bottom: 4px;
+        }
+
+        input[type=text],
+        input[type=tel],
+        input[type=password],
+        textarea,
+        select {
+            width: 100%;
+            border: 1.5px solid #E5E7EB;
+            border-radius: 8px;
+            padding: .58rem .75rem;
+            font-size: .88rem;
+            font-family: inherit;
+            transition: border-color .2s;
+            outline: none;
+            background: #fff;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            border-color: var(--red);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 90px;
+        }
+
+        .img-upload {
+            border: 2px dashed #D1D5DB;
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all .2s;
+            background: #FAFAFA;
+        }
+
+        .img-upload:hover {
+            border-color: var(--red);
+            background: var(--red-dim);
+        }
+
+        .img-upload input {
+            display: none;
+        }
+
+        .img-preview {
+            width: 100%;
+            max-height: 180px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-top: 8px;
+            display: none;
+        }
+
+        .btn-save {
+            background: var(--red);
+            color: #fff;
+            border-radius: 8px;
+            padding: .7rem 1.5rem;
+            font-weight: 800;
+            font-size: .9rem;
+            border: none;
+            cursor: pointer;
+            transition: background .2s, transform .15s;
+        }
+
+        .btn-save:hover {
+            background: var(--red-lt);
+            transform: translateY(-1px);
+        }
+
+        .btn-save:disabled {
+            opacity: .6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-light {
+            background: #fff;
+            color: var(--red);
+            border: 1.5px solid var(--red);
+            border-radius: 8px;
+            padding: .6rem 1rem;
+            font-weight: 700;
+            font-size: .86rem;
+            cursor: pointer;
+        }
+
+        #toast {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            background: #1E2027;
+            color: #fff;
+            padding: .75rem 1.25rem;
+            border-radius: 10px;
+            font-size: .85rem;
+            opacity: 0;
+            transform: translateY(8px);
+            transition: all .3s;
+            pointer-events: none;
+            z-index: 9999;
+            max-width: 360px;
+        }
+
+        #toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        #toast.success {
+            border-left: 4px solid #22C55E;
+        }
+
+        #toast.error {
+            border-left: 4px solid var(--red);
+        }
+
+        .acard {
+            background: #fff;
+            border-radius: 14px;
+            padding: 1.25rem 1.5rem;
+            box-shadow: 0 1px 6px rgba(0, 0, 0, .07);
+        }
+
+        .sec-head {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: #1E2027;
+            border-bottom: 2px solid var(--red-dim);
+            padding-bottom: .5rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .fgrid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        @media(max-width:640px) {
+            .fgrid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .small-note {
+            font-size: .75rem;
+            color: #9CA3AF;
+            margin-top: .25rem;
+        }
+
+        .pill {
+            font-size: .72rem;
+            font-weight: 800;
+            padding: .18rem .55rem;
+            border-radius: 50px;
+            display: inline-block;
+            background: #FEF3C7;
+            color: #92400E;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="login-overlay">
+        <div style="background:#fff;border-radius:20px;padding:2.2rem;width:92%;max-width:390px;text-align:center;">
+            <div class="text-4xl mb-2">🔐</div>
+            <h2 style="font-size:1.2rem;font-weight:800;margin-bottom:.25rem;">Admin Panel</h2>
+            <p style="font-size:.82rem;color:#6B7280;margin-bottom:1rem;">ໃສ່ Apps Script URL ແລະ Admin Secret</p>
+            <input type="text" id="api-url-input" placeholder="Apps Script Web App URL"
+                style="text-align:left;margin-bottom:.65rem;" />
+            <input type="password" id="secret-input" placeholder="Admin Secret"
+                style="text-align:center;margin-bottom:.75rem;" onkeydown="if(event.key==='Enter')doLogin()" />
+            <button onclick="doLogin()"
+                style="width:100%;background:var(--red);color:#fff;border:none;border-radius:8px;padding:.75rem;font-weight:800;font-size:.95rem;cursor:pointer;font-family:inherit;">ເຂົ້າສູ່ລະບົບ</button>
+            <p id="pw-err" style="color:var(--red);font-size:.8rem;margin-top:.6rem;display:none;">ກະລຸນາໃສ່ URL ແລະ
+                Secret</p>
+            <p style="font-size:.72rem;color:#9CA3AF;margin-top:1.2rem;line-height:1.6;">Secret ຈະບໍ່ຖືກຂຽນໃນ code
+                ແຕ່ຈະເກັບໃນ session ຊົ່ວຄາວ</p>
+        </div>
+    </div>
+
+    <div id="main-wrap" class="flex" style="min-height:100vh;">
+        <div id="sidebar" class="py-6 px-3 flex flex-col gap-1">
+            <div class="flex items-center gap-2 px-3 mb-4">
+                <span style="font-size:1.5rem;color:var(--red);">⚙</span>
+                <div>
+                    <p style="color:#fff;font-weight:800;font-size:.92rem;line-height:1.1;">Admin Panel</p>
+                    <p style="color:rgba(255,255,255,.4);font-size:.7rem;">Google Sheets + Drive</p>
+                </div>
+            </div>
+            <div class="nav-item active" onclick="showPanel(event,'hero')"><span>🏠</span> Hero / ໜ້າຫຼັກ</div>
+            <div class="nav-item" onclick="showPanel(event,'about')"><span>👩‍🏫</span> ປະຫວັດຄູ</div>
+            <div class="nav-item" onclick="showPanel(event,'location')"><span>📍</span> ສະຖານທີ່</div>
+            <div class="nav-item" onclick="showPanel(event,'contact')"><span>📞</span> ຕິດຕໍ່</div>
+            <div class="nav-item" onclick="showPanel(event,'images')"><span>🖼️</span> ຈັດການຮູບ</div>
+            <div class="nav-item" onclick="showPanel(event,'lessons')"><span>📚</span> ຈັດການບົດຮຽນ</div>
+            <div class="nav-item" onclick="showPanel(event,'settings')"><span>🔧</span> ຕັ້ງຄ່າ API</div>
+            <div style="flex:1;"></div>
+            <div class="px-3 mt-4 space-y-2">
+                <a href="index.html" target="_blank"
+                    style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.07);color:rgba(255,255,255,.7);border-radius:8px;padding:.5rem .8rem;font-size:.8rem;text-decoration:none;">🌐
+                    ເບິ່ງໜ້າເວັບ</a>
+                <button onclick="doLogout()"
+                    style="width:100%;display:flex;align-items:center;gap:8px;background:rgba(192,57,43,.2);color:#F87171;border:none;border-radius:8px;padding:.5rem .8rem;font-size:.8rem;cursor:pointer;font-family:inherit;">🚪
+                    ອອກຈາກລະບົບ</button>
+            </div>
+        </div>
+
+        <div class="flex-1 p-4 sm:p-6 overflow-auto">
+            <div id="panel-hero" class="panel active space-y-5 max-w-2xl">
+                <h1 class="text-xl font-bold text-gray-800">🏠 Hero · ໜ້າຫຼັກ</h1>
+                <div class="acard space-y-4">
+                    <p class="sec-head">ຊື່ຄູ &amp; ສໂລແກນ</p>
+                    <div class="fgrid">
+                        <div><label>ຊື່ຄູ (ລາວ)</label><input type="text" id="f-teacherName" placeholder="ຄູຢາຊາ" />
+                        </div>
+                        <div><label>ຊື່ຄູ (ຈີນ)</label><input type="text" id="f-teacherNameCN" placeholder="玲老师" />
+                        </div>
+                    </div>
+                    <div><label>ສໂລແກນຫຼັກ</label><input type="text" id="f-slogan"
+                            placeholder="ຮຽນຈີນງ່າຍໆ ສໄຕລ໌ຕົວຕໍ່ຕົວ" /></div>
+                    <div><label>ສໂລແກນຍ່ອຍ</label><input type="text" id="f-subSlogan"
+                            placeholder="ເຂົ້າໃຈຈິງ · ໃຊ້ໄດ້ຈິງ · ມ່ວນຈິງ" /></div>
+                </div>
+                <div class="acard space-y-4">
+                    <p class="sec-head">ສະຖິຕິ</p>
+                    <div class="fgrid">
+                        <div><label>ປີປະສົບການ</label><input type="text" id="f-statYears" placeholder="8+" /></div>
+                        <div><label>ຈຳນວນນັກຮຽນ</label><input type="text" id="f-statStudents" placeholder="200+" />
+                        </div>
+                    </div>
+                </div>
+                <button class="btn-save w-full" onclick="saveAll()">💾 ບັນທຶກການປ່ຽນແປງ</button>
+            </div>
+
+            <div id="panel-about" class="panel space-y-5 max-w-2xl">
+                <h1 class="text-xl font-bold text-gray-800">👩‍🏫 ປະຫວັດ &amp; ປະສົບການ</h1>
+                <div class="acard space-y-4">
+                    <p class="sec-head">ຂໍ້ຄວາມ</p>
+                    <div><label>ຫຍໍ້ປະຫວັດ (ວັກທີ 1)</label><textarea id="f-aboutP1" rows="4"></textarea></div>
+                    <div><label>ຂໍ້ຄວາມ (ວັກທີ 2)</label><textarea id="f-aboutP2" rows="4"></textarea></div>
+                </div>
+                <div class="acard space-y-4">
+                    <p class="sec-head">ຕາຕະລາງສອນ</p>
+                    <div><label>ເວລາຮັບສອນ</label><input type="text" id="f-scheduleTime" /></div>
+                    <div><label>ຮູບແບບ</label><input type="text" id="f-scheduleFormat" /></div>
+                </div>
+                <button class="btn-save w-full" onclick="saveAll()">💾 ບັນທຶກ</button>
+            </div>
+
+            <div id="panel-location" class="panel space-y-5 max-w-2xl">
+                <h1 class="text-xl font-bold text-gray-800">📍 ສະຖານທີ່ຮຽນ</h1>
+                <div class="acard space-y-4">
+                    <div><label>ຄຳອະທິບາຍສະຖານທີ່</label><textarea id="f-locText" rows="3"></textarea></div>
+                    <div><label>ທີ່ຢູ່ / ສະຖານທີ່</label><input type="text" id="f-locAddr" /></div>
+                    <div><label>ໃກ້ສະຖານທີ່ໃດ</label><input type="text" id="f-locNearby" /></div>
+                </div>
+                <button class="btn-save w-full" onclick="saveAll()">💾 ບັນທຶກ</button>
+            </div>
+
+            <div id="panel-contact" class="panel space-y-5 max-w-2xl">
+                <h1 class="text-xl font-bold text-gray-800">📞 ຂໍ້ມູນຕິດຕໍ່</h1>
+                <div class="acard space-y-4">
+                    <div><label>ເບີໂທລະສັບ</label><input type="tel" id="f-phone" placeholder="+85620xxxxxxxx" /></div>
+                    <div><label>WhatsApp Number</label><input type="tel" id="f-whatsapp" placeholder="+85620xxxxxxxx" />
+                        <p class="small-note">ໃສ່ເປັນເລກ ເຊັ່ນ +85620xxxxxxxx</p>
+                    </div>
+                </div>
+                <button class="btn-save w-full" onclick="saveAll()">💾 ບັນທຶກ</button>
+            </div>
+
+            <div id="panel-images" class="panel space-y-5 max-w-2xl">
+                <h1 class="text-xl font-bold text-gray-800">🖼️ ຈັດການຮູບພາບ</h1>
+                <p class="text-sm text-gray-500">ຮູບຈະຖືກອັບໂຫລດໄປ Google Drive ແລ້ວ link ຈະຖືກບັນທຶກໃນ Google Sheets
+                </p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    <div class="acard">
+                        <p class="sec-head">ຮູບຄູ (Hero)</p>
+                        <div class="img-upload" onclick="pick('up-hero')">
+                            <p>📷 ກົດເລືອກຮູບ</p><input type="file" id="up-hero" accept="image/*"
+                                onchange="previewImg(this,'prev-hero')" /><img id="prev-hero" class="img-preview" />
+                        </div>
+                    </div>
+                    <div class="acard">
+                        <p class="sec-head">ຮູບ Background ຂວາ</p>
+                        <div class="img-upload" onclick="pick('up-strip')">
+                            <p>📷 ກົດເລືອກຮູບ</p><input type="file" id="up-strip" accept="image/*"
+                                onchange="previewImg(this,'prev-strip')" /><img id="prev-strip" class="img-preview" />
+                        </div>
+                    </div>
+                    <div class="acard">
+                        <p class="sec-head">ຮູບຂະນະສອນ</p>
+                        <div class="img-upload" onclick="pick('up-about1')">
+                            <p>📷 ກົດເລືອກຮູບ</p><input type="file" id="up-about1" accept="image/*"
+                                onchange="previewImg(this,'prev-about1')" /><img id="prev-about1" class="img-preview" />
+                        </div>
+                    </div>
+                    <div class="acard">
+                        <p class="sec-head">ຮູບຫ້ອງຮຽນ</p>
+                        <div class="img-upload" onclick="pick('up-about2')">
+                            <p>📷 ກົດເລືອກຮູບ</p><input type="file" id="up-about2" accept="image/*"
+                                onchange="previewImg(this,'prev-about2')" /><img id="prev-about2" class="img-preview" />
+                        </div>
+                    </div>
+                    <div class="acard">
+                        <p class="sec-head">ຮູບສື່ການສອນ</p>
+                        <div class="img-upload" onclick="pick('up-about3')">
+                            <p>📷 ກົດເລືອກຮູບ</p><input type="file" id="up-about3" accept="image/*"
+                                onchange="previewImg(this,'prev-about3')" /><img id="prev-about3" class="img-preview" />
+                        </div>
+                    </div>
+                    <div class="acard">
+                        <p class="sec-head">ຮູບສະຖານທີ່</p>
+                        <div class="img-upload" onclick="pick('up-location')">
+                            <p>📷 ກົດເລືອກຮູບ</p><input type="file" id="up-location" accept="image/*"
+                                onchange="previewImg(this,'prev-location')" /><img id="prev-location"
+                                class="img-preview" />
+                        </div>
+                    </div>
+                </div>
+                <button class="btn-save w-full" onclick="saveAll()">💾 ອັບໂຫລດ & ບັນທຶກຮູບ</button>
+            </div>
+
+            <div id="panel-lessons" class="panel space-y-5 max-w-3xl">
+                <h1 class="text-xl font-bold text-gray-800">📚 ຈັດການບົດຮຽນ</h1>
+                <div class="flex gap-2 flex-wrap"><button onclick="adminSetLevel('beginner')" id="atab-beginner"
+                        class="atab btn-light">初级 · ເລີ່ມຕົ້ນ</button><button onclick="adminSetLevel('intermediate')"
+                        id="atab-intermediate" class="atab btn-light">中级 · ສົນທະນາ</button><button
+                        onclick="adminSetLevel('advanced')" id="atab-advanced" class="atab btn-light">高级 · HSK</button>
+                </div>
+                <div id="admin-lesson-list" class="space-y-2 min-h-[60px]"></div>
+                <div id="admin-lesson-empty" class="hidden text-center py-10 rounded-xl text-sm text-gray-400"
+                    style="background:#F9FAFB;">📖 ຍັງບໍ່ມີບົດຮຽນ</div>
+                <div class="acard space-y-4">
+                    <p class="sec-head">➕ ເພີ່ມບົດຮຽນໃໝ່</p>
+                    <div class="fgrid">
+                        <div><label>ລະດັບ</label><select id="af-level">
+                                <option value="beginner">初级 · ເລີ່ມຕົ້ນ</option>
+                                <option value="intermediate">中级 · ສົນທະນາ</option>
+                                <option value="advanced">高级 · HSK</option>
+                            </select></div>
+                        <div><label>ຫົວຂໍ້</label><input type="text" id="af-title"
+                                placeholder="ຕົວຢ່າງ: ການທັກທາຍ · 你好" /></div>
+                    </div>
+                    <div><label>ເນື້ອຫາ / ໄວຍາກອນ</label><textarea id="af-desc" rows="4"></textarea></div><button
+                        class="btn-save" onclick="adminAddLesson()">💾 ບັນທຶກບົດຮຽນ</button>
+                </div>
+                <button class="btn-save w-full" onclick="saveAll()">💾 Save ບົດຮຽນໄປ Google Sheets</button>
+            </div>
+
+            <div id="panel-settings" class="panel space-y-5 max-w-2xl">
+                <h1 class="text-xl font-bold text-gray-800">🔧 ຕັ້ງຄ່າ API</h1>
+                <div class="acard space-y-4">
+                    <p class="sec-head">Connection</p>
+                    <div><label>Apps Script Web App URL</label><input type="text" id="f-apiUrl" /></div>
+                    <div><label>Admin Secret</label><input type="password" id="f-secret" />
+                        <p class="small-note">Secret ຈະໃຊ້ສົ່ງໄປ Apps Script ເພື່ອກວດສອບກ່ອນ Save</p>
+                    </div><button class="btn-save" onclick="saveApiSettings()">💾 ບັນທຶກ API Settings</button><button
+                        class="btn-light" onclick="loadFromServer()">🔄 Test / Load from Google Sheets</button>
+                </div>
+                <div class="acard bg-yellow-50 border border-yellow-200">
+                    <p class="text-xs font-bold text-yellow-700 mb-1">⚠️ Security</p>
+                    <p class="text-xs text-yellow-700 leading-relaxed">อย่าใส่ Secret ลงใน source code. ให้ลูกค้าใส่ตอน
+                        login หรือบันทึกใน browser ของเขาเท่านั้น. Apps Script เป็นตัวตรวจว่า Secret ถูกหรือไม่.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="toast"></div>
+
+    <script>
+        const API_URL_KEY = 'kru_api_url';
+        let API_URL = localStorage.getItem(API_URL_KEY) || '';
+        let ADMIN_SECRET = sessionStorage.getItem('kru_admin_secret') || '';
+        let pendingImages = {};
+        let lessons = [];
+        let adminLevel = 'beginner';
+
+        const FIELDS = {
+            'f-teacherName': 'teacherName',
+            'f-teacherNameCN': 'teacherNameCN',
+            'f-slogan': 'slogan',
+            'f-subSlogan': 'subSlogan',
+            'f-statYears': 'statYears',
+            'f-statStudents': 'statStudents',
+            'f-aboutP1': 'aboutP1',
+            'f-aboutP2': 'aboutP2',
+            'f-scheduleTime': 'scheduleTime',
+            'f-scheduleFormat': 'scheduleFormat',
+            'f-locText': 'locText',
+            'f-locAddr': 'locAddr',
+            'f-locNearby': 'locNearby',
+            'f-phone': 'phone',
+            'f-whatsapp': 'whatsapp'
+        };
+
+        const imgKeyMap = {
+            'up-hero': 'imgHero',
+            'up-strip': 'imgStrip',
+            'up-about1': 'imgAbout1',
+            'up-about2': 'imgAbout2',
+            'up-about3': 'imgAbout3',
+            'up-location': 'imgLocation'
+        };
+
+        const previewMap = {
+            'imgHero': 'prev-hero',
+            'imgStrip': 'prev-strip',
+            'imgAbout1': 'prev-about1',
+            'imgAbout2': 'prev-about2',
+            'imgAbout3': 'prev-about3',
+            'imgLocation': 'prev-location'
+        };
+
+        async function apiPost(payload) {
+            const res = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(payload)
+            });
+            return await res.json();
+        }
+
+        async function doLogin() {
+            const url = document.getElementById('api-url-input').value.trim();
+            const secret = document.getElementById('secret-input').value.trim();
+            const err = document.getElementById('pw-err');
+
+            err.style.display = 'none';
+
+            if (!url || !secret) {
+                err.textContent = 'ກະລຸນາໃສ່ URL ແລະ Secret';
+                err.style.display = 'block';
+                return;
+            }
+
+            API_URL = url;
+            ADMIN_SECRET = secret;
+
+            try {
+                err.textContent = 'ກຳລັງກວດສອບ...';
+                err.style.display = 'block';
+                err.style.color = '#6B7280';
+
+                const j = await apiPost({ action: 'login', secret: ADMIN_SECRET });
+
+                if (!j.ok) throw new Error(j.error || 'Login failed');
+
+                localStorage.setItem(API_URL_KEY, API_URL);
+                sessionStorage.setItem('kru_admin_secret', ADMIN_SECRET);
+
+                document.getElementById('login-overlay').style.display = 'none';
+                fillApiSettings();
+
+                if (j.data) {
+                    setFormData(j.data);
+                    toast('Login ສຳເລັດ ✓', 'success');
+                } else {
+                    await loadFromServer();
+                }
+            } catch (e) {
+                err.style.color = 'var(--red)';
+                err.textContent = 'Login error: ' + e.message;
+                err.style.display = 'block';
+                sessionStorage.removeItem('kru_admin_secret');
+            }
+        }
+
+        function doLogout() {
+            sessionStorage.removeItem('kru_admin_secret');
+            location.reload();
+        }
+
+        (function initLogin() {
+            const urlInput = document.getElementById('api-url-input');
+            if (urlInput) urlInput.value = API_URL;
+
+            // เพื่อความปลอดภัย ให้ login ใหม่ทุกครั้งหลังปิด browser
+            // ถ้า session ยังอยู่ จะโหลดข้อมูลให้
+            if (API_URL && ADMIN_SECRET) {
+                document.getElementById('login-overlay').style.display = 'none';
+                setTimeout(() => {
+                    fillApiSettings();
+                    loadFromServer();
+                }, 50);
+            }
+        })();
+
+        function fillApiSettings() {
+            const u = document.getElementById('f-apiUrl');
+            const s = document.getElementById('f-secret');
+            if (u) u.value = API_URL;
+            if (s) s.value = ADMIN_SECRET;
+        }
+
+        function saveApiSettings() {
+            API_URL = document.getElementById('f-apiUrl').value.trim();
+            ADMIN_SECRET = document.getElementById('f-secret').value.trim();
+            localStorage.setItem(API_URL_KEY, API_URL);
+            sessionStorage.setItem('kru_admin_secret', ADMIN_SECRET);
+            toast('ບັນທຶກ API settings ແລ້ວ', 'success');
+        }
+
+        function showPanel(ev, name) {
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById('panel-' + name).classList.add('active');
+            if (ev && ev.currentTarget) ev.currentTarget.classList.add('active');
+            if (name === 'lessons') adminSetLevel(adminLevel);
+            if (name === 'settings') fillApiSettings();
+        }
+
+        function setFormData(d) {
+            d = d || {};
+            for (const [fid, key] of Object.entries(FIELDS)) {
+                const el = document.getElementById(fid);
+                if (el && d[key] != null) el.value = d[key];
+            }
+
+            try {
+                lessons = JSON.parse(d.lessons || '[]');
+                if (!Array.isArray(lessons)) lessons = [];
+            } catch (e) {
+                lessons = [];
+            }
+            adminRenderLessons();
+
+            for (const [key, pid] of Object.entries(previewMap)) {
+                if (d[key]) {
+                    const el = document.getElementById(pid);
+                    if (el) {
+                        el.src = d[key];
+                        el.style.display = 'block';
+                    }
+                }
+            }
+        }
+
+        function getFormData() {
+            const d = {};
+            for (const [fid, key] of Object.entries(FIELDS)) {
+                const el = document.getElementById(fid);
+                if (el) d[key] = el.value.trim();
+            }
+            d.lessons = JSON.stringify(lessons);
+            return d;
+        }
+
+        async function loadFromServer() {
+            if (!API_URL) {
+                toast('ກະລຸນາໃສ່ Apps Script URL', 'error');
+                return;
+            }
+
+            try {
+                const res = await fetch(API_URL + '?t=' + Date.now());
+                const j = await res.json();
+
+                if (!j.ok) throw new Error(j.error || 'Load failed');
+
+                setFormData(j.data || {});
+                toast('ໂຫລດຂໍ້ມູນຈາກ Google Sheets ສຳເລັດ', 'success');
+            } catch (err) {
+                toast('Load error: ' + err.message, 'error');
+            }
+        }
+
+        async function saveAll() {
+            if (!API_URL || !ADMIN_SECRET) {
+                toast('ກະລຸນາຕັ້ງ API URL ແລະ Secret', 'error');
+                return;
+            }
+
+            const btns = document.querySelectorAll('.btn-save');
+            btns.forEach(b => b.disabled = true);
+
+            try {
+                const payload = {
+                    action: 'save',
+                    secret: ADMIN_SECRET,
+                    data: getFormData(),
+                    images: pendingImages
+                };
+
+                const j = await apiPost(payload);
+
+                if (!j.ok) throw new Error(j.error || 'Save failed');
+
+                pendingImages = {};
+                setFormData(j.data || {});
+                toast('ບັນທຶກໄປ Google Sheets/Drive ສຳເລັດ ✓', 'success');
+            } catch (err) {
+                toast('Save error: ' + err.message, 'error');
+            } finally {
+                btns.forEach(b => b.disabled = false);
+            }
+        }
+
+        function pick(id) {
+            document.getElementById(id).click();
+        }
+
+        function previewImg(input, previewId) {
+            const file = input.files[0];
+            if (!file) return;
+
+            if (file.size > 3 * 1024 * 1024) {
+                toast('ຮູບໃຫຍ່ເກີນ 3MB', 'error');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = e => {
+                const src = e.target.result;
+                const prev = document.getElementById(previewId);
+                prev.src = src;
+                prev.style.display = 'block';
+
+                const key = imgKeyMap[input.id];
+                pendingImages[key] = { name: file.name, dataUrl: src };
+                toast('ເລືອກຮູບແລ້ວ ກົດ Save ເພື່ອອັບໂຫລດ', 'success');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function adminSetLevel(lv) {
+            adminLevel = lv;
+
+            document.querySelectorAll('.atab').forEach(t => {
+                t.style.background = '#fff';
+                t.style.color = 'var(--red)';
+            });
+
+            const a = document.getElementById('atab-' + lv);
+            if (a) {
+                a.style.background = 'var(--red)';
+                a.style.color = '#fff';
+            }
+
+            adminRenderLessons();
+        }
+
+        function adminRenderLessons() {
+            const list = document.getElementById('admin-lesson-list');
+            const empty = document.getElementById('admin-lesson-empty');
+            if (!list) return;
+
+            const filtered = lessons.filter(l => l.level === adminLevel);
+            list.innerHTML = '';
+
+            if (filtered.length === 0) {
+                if (empty) empty.classList.remove('hidden');
+                return;
+            }
+
+            if (empty) empty.classList.add('hidden');
+
+            filtered.forEach((lesson, idx) => {
+                const gi = lessons.indexOf(lesson);
+                const row = document.createElement('div');
+                row.style.cssText = 'background:#fff;border:1px solid #E8E9ED;border-radius:12px;padding:12px 14px;display:flex;gap:12px;align-items:flex-start;';
+                row.innerHTML =
+                    '<div style="width:26px;height:26px;border-radius:50%;background:var(--red);color:#fff;font-size:.72rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">' + (idx + 1) + '</div>' +
+                    '<div style="flex:1;min-width:0;">' +
+                    '<p style="font-weight:700;font-size:.88rem;margin-bottom:3px;">' + escHtml(lesson.title) + '</p>' +
+                    '<p style="font-size:.8rem;color:#8A8FA3;white-space:pre-wrap;line-height:1.6;">' + escHtml(lesson.desc) + '</p>' +
+                    '</div>' +
+                    '<button onclick="adminDelLesson(' + gi + ')" style="width:28px;height:28px;border-radius:50%;background:#FEE2E2;border:none;cursor:pointer;color:#DC2626;">×</button>';
+                list.appendChild(row);
+            });
+        }
+
+        function adminAddLesson() {
+            const level = document.getElementById('af-level').value;
+            const title = document.getElementById('af-title').value.trim();
+            const desc = document.getElementById('af-desc').value.trim();
+
+            if (!title) {
+                document.getElementById('af-title').focus();
+                return;
+            }
+
+            lessons.push({ level, title, desc, id: Date.now() });
+            document.getElementById('af-title').value = '';
+            document.getElementById('af-desc').value = '';
+            adminSetLevel(level);
+            toast('ເພີ່ມບົດຮຽນແລ້ວ — ກົດ Save ເພື່ອສົ່ງໄປ Google Sheets', 'success');
+        }
+
+        function adminDelLesson(idx) {
+            if (!confirm('ລຶບບົດຮຽນນີ້?')) return;
+            lessons.splice(idx, 1);
+            adminRenderLessons();
+            toast('ລຶບແລ້ວ — ກົດ Save ເພື່ອຢືນຢັນ', 'success');
+        }
+
+        function escHtml(s) {
+            return String(s || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        function toast(msg, type = 'success') {
+            const el = document.getElementById('toast');
+            el.textContent = msg;
+            el.className = 'show ' + type;
+            setTimeout(() => el.className = '', 3600);
+        }
+
+        document.addEventListener('keydown', e => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                saveAll();
+            }
+        });
+    </script>
+</body>
+
+</html>
