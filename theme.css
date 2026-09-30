@@ -1,0 +1,101 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@500;700;900&family=Ma+Shan+Zheng&family=Noto+Sans+Lao:wght@300;400;500;600;700;800&display=swap');
+
+/* ════════ theme.css — สไตล์โปสเตอร์ HSK2 (น้ำเงิน · เหลือง · แดงธง) ════════
+   วางบรรทัดนี้ก่อน </head> ของ index.html, lesson.html, admin.html
+   <link rel="stylesheet" href="theme.css">
+   ═══════════════════════════════════════════════════════════════════ */
+
+:root{
+  --red:#1D4E9F;      /* สีหลัก (เดิมแดง → น้ำเงินโปสเตอร์) */
+  --red-lt:#3A6CC4;
+  --red-dim:#FFF3B8;  /* พื้นอ่อน (เดิมชมพู → เหลืองอ่อน) */
+  --gray:#566F9E;
+  --gray-lt:#EAF3FC;
+  --ink:#14295A;
+  --yellow:#FFD83D;
+  --blue-dk:#12377A;
+  --flag:#D62828;
+}
+
+/* ── พื้นหลัง ── */
+body{
+  font-family:'Noto Sans Lao','Noto Sans SC',sans-serif;
+  background:linear-gradient(180deg,#EAF3FC,#FFFBEA 60%) fixed;
+}
+body::before{
+  content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:
+    radial-gradient(circle at 12% 8%,rgba(255,216,61,.35),transparent 38%),
+    radial-gradient(circle at 90% 30%,rgba(29,78,159,.14),transparent 40%),
+    radial-gradient(rgba(29,78,159,.09) 1.3px,transparent 1.4px) 0 0/22px 22px;
+}
+.bg-pattern{background-image:none!important}
+
+/* ── ฟอนต์ ── */
+h1,h2,h3,.hero-h1,.sec-h2{font-family:'Noto Sans Lao','Noto Sans SC',sans-serif;font-weight:800}
+.font-cn,.deco,.deco-char{font-family:'Noto Sans SC',sans-serif!important;font-weight:900}
+#hero-name-cn{font-family:'Ma Shan Zheng',cursive!important;font-weight:400;font-size:1.05em!important;color:var(--flag)!important}
+#contact .font-cn{font-family:'Ma Shan Zheng',cursive!important;font-weight:400;font-size:1.7rem;color:var(--yellow)!important}
+footer .font-cn{font-family:'Ma Shan Zheng',cursive!important;font-weight:400;font-size:1rem;color:var(--yellow)!important}
+.sec-h2{color:var(--red)}
+#contact .sec-h2{color:#fff}
+
+/* ── ป้ายหัวข้อเล็ก / เส้นเน้น ── */
+.stag{background:var(--yellow);color:var(--blue-dk)!important;padding:.2rem .85rem;border-radius:99px;font-weight:800}
+.stag::before{display:none}
+.accent::before{background:var(--yellow);height:5px;width:56px}
+.divider{height:4px;border-radius:4px;background:linear-gradient(90deg,transparent,var(--yellow),transparent);opacity:.85}
+
+/* ── แถบเมนู ── */
+nav{background:rgba(255,255,255,.92)!important;border-bottom:3px solid var(--yellow)!important}
+.hover\:text-red-600:hover{color:var(--red)!important}
+.hover\:bg-gray-100:hover{background:var(--red-dim)!important}
+
+/* ── ปุ่ม (สไตล์สติกเกอร์) ── */
+.btn-r{background:var(--yellow)!important;color:var(--blue-dk)!important;box-shadow:0 5px 0 #d8a800}
+.btn-r:hover{transform:translateY(2px)!important;box-shadow:0 3px 0 #d8a800!important}
+.btn-o{border-color:var(--red)!important;color:var(--red)!important}
+.btn-o:hover{background:var(--red)!important;color:#fff!important}
+#contact .btn-o{background:#fff}
+
+/* ── การ์ด / ไอคอน / สถิติ ── */
+.card{border:2px solid #DCE7F5!important;border-radius:20px!important}
+.card:hover{border-color:var(--red)!important;box-shadow:0 14px 34px rgba(29,78,159,.18)!important}
+.ic{background:var(--red)!important;box-shadow:0 0 0 3px #fff,0 0 0 5px var(--red)}
+.ic svg{color:#fff!important}
+.stat{background:var(--red-dim)!important;border:2px solid #fff;box-shadow:0 4px 12px rgba(29,78,159,.1)}
+.lesson-mini-link{color:var(--red)!important}
+
+/* ── รูป ── */
+.img-frame{border:6px solid #fff;box-shadow:0 14px 34px rgba(29,78,159,.22)!important;border-radius:16px!important}
+.hero-strip::after{background:rgba(29,78,159,.28)!important}
+
+/* ── ติดต่อ / ท้ายหน้า (แถบน้ำเงินแบบโปสเตอร์) ── */
+#contact{background:var(--red)!important}
+footer{background:var(--blue-dk)!important}
+
+/* ── ป้ายแบนเนอร์ HSK2 (ตัวเลือก: วาง HTML ใน index.html ดูวิธีด้านล่าง) ── */
+.poster-banner{display:inline-block;text-align:center;background:var(--yellow);padding:1rem 2.2rem;
+  clip-path:polygon(1% 12%,8% 0,30% 6%,55% 0,80% 5%,99% 0,100% 40%,97% 70%,100% 95%,70% 100%,40% 96%,10% 100%,0 80%,3% 45%);
+  filter:drop-shadow(0 8px 0 rgba(216,168,0,.55))}
+.poster-banner b{display:block;font-family:'Noto Sans SC',sans-serif;font-weight:900;line-height:1;color:var(--red);
+  font-size:clamp(2.6rem,9vw,4.5rem);text-shadow:3px 3px 0 #fff}
+.poster-banner span{display:block;font-family:'Noto Sans SC',sans-serif;font-weight:900;color:var(--ink);font-size:clamp(1.4rem,5vw,2.2rem)}
+
+/* ════════ lesson.html ════════ */
+.level-hero{background:linear-gradient(135deg,var(--red) 0%,var(--red-lt) 100%)!important;box-shadow:0 8px 0 var(--blue-dk)}
+.tab:hover,.tab.active{border-color:var(--red)}
+.tab.active{box-shadow:0 5px 0 var(--blue-dk)!important}
+.num{background:var(--yellow)!important;color:var(--blue-dk)!important;font-weight:900}
+.lcard{border:2px solid #DCE7F5!important}
+.lcard:hover{border-color:var(--red)!important;box-shadow:0 10px 28px rgba(29,78,159,.15)!important}
+
+/* ════════ admin.html ════════ */
+#login-overlay{background:rgba(20,41,90,.97)!important}
+#sidebar{background:var(--ink)!important}
+.nav-item:hover,.nav-item.active{background:rgba(255,216,61,.18)!important}
+.nav-item.active{border-left-color:var(--yellow)!important}
+.btn-save{background:var(--red)!important;box-shadow:0 4px 0 var(--blue-dk)}
+.btn-save:hover{background:var(--red-lt)!important}
+.btn-light{color:var(--red)!important;border-color:var(--red)!important}
+.sec-head{border-bottom-color:var(--yellow)!important}
